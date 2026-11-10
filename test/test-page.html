@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>Safinum Pay — page de test locale</title></head>
+<body>
+  <h1>Safinum Pay</h1>
+  <p id="greet">Bonjour, Amina</p>
+  <p>Solde disponible</p>
+  <p id="bal">250 000 FCFA</p>
+  <p>Numéro de compte : CM 001 2345 6789 01</p>
+  <button id="go">Effectuer un transfert</button>
+  <input id="phone" placeholder="Merci" value="+237 677 12 34 56">
+  <ul id="tx"><li>Paiement marchand −12 500 FCFA</li><li>Non</li></ul>
+  <p id="ctx">Non disponible</p>
+  <!-- Contenu injecté après le chargement (simule le jury) -->
+  <script>
+    setTimeout(() => {
+      const d = document.createElement("div");
+      d.innerHTML = '<p id="dyn">Merci</p><p id="dyn2">Montant : 50 000 FCFA — Ref TRX-2026-0042</p>';
+      document.body.appendChild(d);
+    }, 1500);
+  </script>
+</body></html>
