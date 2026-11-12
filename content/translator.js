@@ -129,5 +129,10 @@ Lena.translator = (() => {
     return { ...stats };
   }
 
-  return { setLanguage, get lang() { return lang; }, set onChange(f) { onChange = f; }, translateString };
+  function getTextLanguage(node) {
+    const rec = texts.get(node);
+    return rec && node.data === rec.written ? lang : null;
+  }
+
+  return { setLanguage, get lang() { return lang; }, set onChange(f) { onChange = f; }, translateString, getTextLanguage };
 })();

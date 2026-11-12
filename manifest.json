@@ -18,8 +18,8 @@
       "all_frames": false,
       "js": [
         "content/logo-data.js", "dict/duala.js", "dict/ewondo.js", "dict/fulfulde.js",
-        "content/protect.js", "content/translator.js", "content/assistant.js",
-        "content/ui-styles.js", "content/ui.js", "content/main.js"
+        "content/protect.js", "content/balance.js", "content/translator.js", "content/assistant.js",
+        "content/ui-styles.js", "content/ui.js", "content/main.js", "content/theme.js"
       ]
     }
   ]

@@ -3,7 +3,7 @@ globalThis.Lena = globalThis.Lena || {};
 Lena.ui = (() => {
   const T = Lena.translator, A = Lena.assistant;
   const api = globalThis.browser ?? globalThis.chrome;
-  let sh, current = "", last = "", stats = { translated: 0 }, bannerClosed = false, listening = null, prevPad = null, tab = "vocal";
+  let sh, current = "", last = "", stats = { translated: 0 }, bannerClosed = false, listening = null, prevPad = null, tab = "vocal", pageReading = false;
   const $ = (s) => sh.querySelector(s);
 
   // Icônes (tracés type Lucide, licence MIT)
@@ -66,9 +66,11 @@ Lena.ui = (() => {
 
     <div class="body" role="tabpanel" id="p-vocal" aria-labelledby="t-vocal">
       <div class="log" id="log-vocal" role="log" aria-live="polite" aria-label="Conversation"></div>
-      <p class="lbl">Suggestions rapides :</p>
-      <div class="chips" role="group" aria-label="Suggestions rapides">
-        ${chip("wallet", "Quel est mon solde ?")}${chip("swap", "Comment transférer ?")}${chip("info", "Explique cette page")}${chip("globe", "Traduire en duala")}
+      <div class="quick-suggestions" id="quickSuggestions">
+        <p class="lbl">Suggestions rapides :</p>
+        <div class="chips" role="group" aria-label="Suggestions rapides">
+          ${chip("wallet", "Quel est mon solde ?")}${chip("swap", "Comment transférer ?")}${chip("info", "Explique cette page")}${chip("globe", "Traduire en duala")}
+        </div>
       </div>
       <div class="mic-row" id="micRow">
         <div class="wave l" id="waveL" aria-hidden="true"></div>
@@ -76,6 +78,11 @@ Lena.ui = (() => {
         <div class="wave r" id="waveR" aria-hidden="true"></div>
       </div>
       <p class="mic-status" id="micStatus" role="status"></p>
+      <div class="page-reader">
+        <button class="cta" id="readPage" type="button">Lire toute la page</button>
+        <button class="cta sec" id="stopPage" type="button" hidden>Arrêter la lecture</button>
+        <p class="note" id="pageSpeechStatus" role="status" aria-live="polite"></p>
+      </div>
       ${form("vocal")}
       <button class="cta sec" id="showDock" type="button" hidden>Réafficher le bouton flottant</button>
     </div>
@@ -116,14 +123,95 @@ Lena.ui = (() => {
   // ---------- Conversation ----------
   const logOf = () => $(tab === "chat" ? "#log-chat" : "#log-vocal");
   function status(text, warn) { const s = $("#micStatus"); s.textContent = text; s.classList.toggle("warn", !!warn); }
+  function pageSpeechStatus(text, warn) {
+    const s = $("#pageSpeechStatus"); s.textContent = text; s.classList.toggle("warn", !!warn);
+  }
+  function stopPageReading(message) {
+    if (!pageReading) return;
+    pageReading = false; A.stopSpeaking();
+    $("#readPage").disabled = false; $("#stopPage").hidden = true;
+    pageSpeechStatus(message);
+  }
+  function startPageReading() {
+    const segments = pageSpeechSegments();
+    if (!segments.length) { pageSpeechStatus("Aucun texte visible à lire sur cette page.", true); return; }
+    const fallbackLang = ["fr", "en"].find(lang => A.canSpeakLang(lang));
+    const fallbackSegments = new Set(segments.filter(segment => !A.canSpeakLang(segment.lang)).map(segment => segment.lang));
+    if (fallbackSegments.size && !fallbackLang) {
+      pageSpeechStatus("Aucune voix locale n'est disponible pour lire cette page. Installez une voix française ou anglaise dans les paramètres vocaux du système.", true);
+      return;
+    }
+    const speechSegments = segments.map(segment =>
+      A.canSpeakLang(segment.lang) ? segment : { ...segment, lang: fallbackLang }
+    );
+    const languages = [...new Set(speechSegments.map(segment => segment.lang))];
+    const label = languages.map(lang => Lena.DICT[lang]?.label || (lang === "fr" ? "français" : lang === "en" ? "anglais" : lang)).join(", ");
+    pageReading = true; $("#readPage").disabled = true; $("#stopPage").hidden = false;
+    const started = A.speakPage(speechSegments, {
+      onEnd: () => {
+        pageReading = false; $("#readPage").disabled = false; $("#stopPage").hidden = true;
+        pageSpeechStatus(fallbackSegments.size
+          ? "Lecture terminée. Certains passages ont été lus avec une voix de secours : leur prononciation peut être approximative."
+          : "Lecture terminée.");
+      },
+      onError: () => {
+        pageReading = false; $("#readPage").disabled = false; $("#stopPage").hidden = true;
+        pageSpeechStatus("La lecture vocale a été interrompue par le navigateur.", true);
+      }
+    });
+    if (!started) {
+      pageReading = false; $("#readPage").disabled = false; $("#stopPage").hidden = true;
+      pageSpeechStatus(`La voix locale pour ${label} n'est pas encore prête. Réessayez dans quelques secondes.`, true);
+      return;
+    }
+    pageSpeechStatus(fallbackSegments.size
+      ? `Lecture en cours (${label}). Certains passages utilisent une voix de secours ; leur prononciation peut être approximative.`
+      : `Lecture de la page (${label})…`);
+  }
+  function pageSpeechSegments() {
+    if (!document.body) return [];
+    const segments = [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let node; (node = walker.nextNode());) {
+      const parent = node.parentElement;
+      if (!parent || !node.data.trim() || parent.closest("#lena-root,[aria-hidden='true'],script,style,noscript,svg,canvas,template,[contenteditable='true']")) continue;
+      if (!isPageTextVisible(parent)) continue;
+
+      const translatedLang = T.getTextLanguage(node);
+      const declaredLang = parent.closest("[lang]")?.getAttribute("lang") || document.documentElement.lang;
+      const lang = speechLanguage(translatedLang || declaredLang || A.detectLang(node.data));
+      const text = node.data.replace(/\s+/g, " ").trim();
+      if (!text) continue;
+      const previous = segments[segments.length - 1];
+      if (previous?.lang === lang) previous.text += " " + text;
+      else segments.push({ text, lang });
+    }
+    return segments;
+  }
+  function isPageTextVisible(el) {
+    if (!el.getClientRects().length) return false;
+    for (let node = el; node; node = node.parentElement) {
+      if (node.hidden) return false;
+      const style = getComputedStyle(node);
+      if (style.display === "none" || style.visibility === "hidden" || style.visibility === "collapse" || style.opacity === "0") return false;
+      if (node === document.body) break;
+    }
+    return true;
+  }
+  function speechLanguage(lang) {
+    const base = (lang || "").trim().toLowerCase().split("-")[0];
+    if (base === "dou" || base === "dua") return "dua";
+    if (base === "und") return A.detectLang("");
+    return base || "fr";
+  }
   function row(log, me) { const r = document.createElement("div"); r.className = "row" + (me ? " moi" : ""); log.appendChild(r); return r; }
-  function addLena(log, lines, say) {
+  function addLena(log, lines, say, spoken, speakLang) {
     const r = row(log, false), img = document.createElement("img"); img.src = Lena.AVATAR; img.alt = ""; r.appendChild(img);
     const b = document.createElement("div"); b.className = "bulle"; r.appendChild(b);
     const t = document.createElement("div"); (Array.isArray(lines) ? lines : [lines]).forEach(l => { const p = document.createElement("p"); p.textContent = l; t.appendChild(p); }); b.appendChild(t);
     if (say) {
       const s = document.createElement("button"); s.type = "button"; s.className = "say"; s.setAttribute("aria-label", "Écouter la réponse"); s.innerHTML = ic("vol");
-      s.addEventListener("click", () => { if (!A.speak([].concat(lines).join(" "))) status("Lecture à voix haute indisponible : aucune voix française locale sur cet appareil.", true); });
+      s.addEventListener("click", () => { stopPageReading("Lecture interrompue."); if (!A.speak(spoken || [].concat(lines).join(" "), speakLang)) status("Lecture à voix haute indisponible : aucune voix locale correspondante sur cet appareil.", true); });
       b.appendChild(s);
     }
     log.scrollTop = log.scrollHeight;
@@ -137,18 +225,28 @@ Lena.ui = (() => {
   const GREETING = ["Bonjour ! 👋", "Je suis LENA, votre assistante intelligente. Comment puis-je vous aider aujourd'hui ?"];
   function reset() {
     for (const id of ["#log-vocal", "#log-chat"]) { $(id).textContent = ""; addLena($(id), GREETING, false); }
+    $("#quickSuggestions").hidden = false;
+    pageSpeechStatus("");
     status(A.canListen() ? "Appuyez sur le micro pour parler (en français)." : "La dictée vocale n'est pas disponible dans ce navigateur (essayez Chrome ou Edge). Écrivez votre question ci-dessous.", !A.canListen());
   }
-  function ask(text, { speak } = {}) {
+    function ask(text, { speak } = {}) {
     text = text.trim(); if (!text) return;
-    const log = logOf(), a = A.answer(text);
-    addMe(log, text); addLena(log, a.text, true);
+    stopPageReading("Lecture interrompue.");
+    $("#quickSuggestions").hidden = true;
+    const log = logOf();
+    if (tab === "chat") {   // Chat intelligent : « pas encore disponible », dans la langue de l'utilisateur
+      const c = A.chatReply(text, { pageLang: current });
+      addMe(log, text); addLena(log, c.lines, c.canSpeak, null, c.speakLang);
+      return;
+    }
+    const a = A.answer(text);
+    addMe(log, text); addLena(log, a.text, true, a.speak, a.speakLang);
     if (a.lang !== undefined) setLang(a.lang || null);
-    if (speak && !A.speak(a.text)) status("Lecture à voix haute indisponible : la réponse est affichée.", true);
+    if (speak && !A.speak(a.speak || a.text, a.speakLang)) status("Lecture à voix haute indisponible : la réponse est affichée.", true);
   }
   function toggleMic() {
     if (listening) { listening.stop(); return; }
-    A.stopSpeaking();
+    stopPageReading("Lecture interrompue."); A.stopSpeaking();
     if (!A.canListen()) { status("La dictée vocale n'est pas disponible dans ce navigateur (essayez Chrome ou Edge). Écrivez votre question ci-dessous.", true); return; }
     $("#mic").setAttribute("aria-pressed", "true"); $("#micRow").classList.add("on"); status("Parlez maintenant…");
     listening = A.listen({
@@ -167,7 +265,7 @@ Lena.ui = (() => {
     selectTab(name || tab, true); notify(true);
   }
   function hidePanel() {
-    A.stopSpeaking(); listening?.stop?.();
+    stopPageReading("Lecture arrêtée."); A.stopSpeaking(); listening?.stop?.();
     $("#panel").hidden = true; $("#fab").setAttribute("aria-expanded", "false"); refreshHint(); notify(false);
   }
   function selectTab(name, focus) {
@@ -183,6 +281,13 @@ Lena.ui = (() => {
 
   // ---------- Traduction ----------
   function setLang(code) {
+    if (code === "ewo" || code === "ful") {
+      $("#tradStatus").textContent = "Cette traduction n'est pas encore disponible sur ce modèle.";
+      $("#tradStatus").classList.add("warn");
+      return;
+    }
+    $("#tradStatus").classList.remove("warn");
+    stopPageReading("Lecture interrompue.");
     if (code) {
       T.setLanguage(code); current = last = code; bannerClosed = false;
       $("#bannerText").textContent = Lena.DICT[code].banner;
@@ -194,7 +299,7 @@ Lena.ui = (() => {
     const on = !!current;
     $("#doTrad").hidden = on; $("#doOrig").hidden = !on;
     $("#toggleOrig").textContent = on ? "Afficher l'original" : "Traduire à nouveau";
-    $("#tradStatus").textContent = on ? `Page en ${Lena.DICT[current].label} — ${stats.translated} texte(s) traduit(s).` : "La page est affichée en français.";
+    $("#tradStatus").textContent = on ? `Page en ${Lena.DICT[current].label} — ${stats.translated} texte(s) traduit(s).` : "La page est affichée dans sa langue d'origine.";
     const showBanner = !!last && !bannerClosed;
     $("#banner").hidden = !showBanner; syncPadding(showBanner); refreshHint();
   }
@@ -230,6 +335,8 @@ Lena.ui = (() => {
     sh.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => ask(c.dataset.q)));
     sh.querySelectorAll("form").forEach(f => f.addEventListener("submit", (e) => { e.preventDefault(); const i = f.querySelector("input"); ask(i.value); i.value = ""; }));
     $("#mic").addEventListener("click", toggleMic);
+    $("#readPage").addEventListener("click", startPageReading);
+    $("#stopPage").addEventListener("click", () => stopPageReading("Lecture arrêtée."));
 
     $("#doTrad").addEventListener("click", () => setLang(selectedLang()));
     $("#doOrig").addEventListener("click", () => setLang(null));

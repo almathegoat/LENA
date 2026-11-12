@@ -1,11 +1,11 @@
-// Dictionnaire Duala — Structuré et prêt pour le parcours Safinum Pay (Hackathon SAFINUM)
-// Clé = texte français EXACT affiché sur la page (casse et accents respectés).
+// Dictionnaire Duala — À FAIRE VALIDER par un 2e locuteur avant la remise.
+// Source : « Traduction Français – Duala v2 » (fiches manuscrites transcrites). Aucun terme n'est encore validé : tout est ok:false.
+// Clé = texte français ou anglais EXACT affiché sur la page.
 //   t        : traduction ({n} = emplacement d'une valeur protégée : montant, numéro, date...)
 //   prefix   : true = ne traduit que le DÉBUT du texte (ex. « Bonjour, Amina » → le nom reste intact)
 //   ok       : true UNIQUEMENT quand un locuteur a validé le terme
-//   critical : true pour une action financière (envoyer, confirmer, annuler...) :
-//              Lena affiche alors « traduction (original) » pour éviter tout contresens.
-
+//   critical : true = Lena affiche « traduction (original) » pour éviter tout contresens.
+//              Utilisé pour les actions financières ET pour les termes dont le mot duala est incohérent dans le Word.
 globalThis.Lena = globalThis.Lena || {};
 Lena.DICT = Lena.DICT || {};
 
@@ -13,107 +13,200 @@ Lena.DICT.dua = {
   label: "Duala",
   banner: "Démonstration de traduction partielle en Duala",
   phrases: {
-    // ------------------------------------------------------------------------
-    // Mots simples / Exemples génériques
-    // ------------------------------------------------------------------------
-    "Bonjour": { t: "Idib'a bwam", ok: true, prefix: true },
-    "Merci":   { t: "Masoma",     ok: true },
-    "Oui":     { t: "Eɛ",         ok: true },
-    "Non":     { t: "Kɛm",        ok: true },
+    "Bonjour": { t: "Idiba bwam", ok: false, prefix: true },
+    "Bienvenue": { t: "Po̱ la bwam", ok: false, prefix: true },
+    "Merci": { t: "Na som", ok: false },
+    "S'il vous plaît": { t: "Na so̱so̱ medi", ok: false },
+    "Oui": { t: "Ne medi é", ok: false },
+    "Non": { t: "Ke̱m", ok: false },
+    "D'accord": { t: "Na kasi", ok: false },
+    "Au revoir": { t: "Na mala", ok: false },
+    "Comment puis-je vous aider aujourd'hui ?": { t: "Ne̱ ni ne na na nongwane̱ o a we̱nge̱ ?", ok: false },
+    "Écrivez votre question": { t: "Bino̱ tila mu yedi ma nu", ok: false },
+    "Parlez maintenant": { t: "Bino̱ to̱po̱ tatanu", ok: false },
+    "Affichez l'original": { t: "Bino̱ tande̱ te̱i-te̱i", ok: false },
+    "Assistant vocal": { t: "Muta te da doi", ok: false },
+    "Chat intelligent": { t: "Singa dibiye̱", ok: false },
+    "Quel est mon solde ?": { t: "Nje' ye' etom yam ?", ok: false },
+    "Comment transférer ?": { t: "Ne̱ ni tombele̱ ?", ok: false },
+    "Explique cette page": { t: "Teleye̱ yen epassi", ok: false },
+    "Traduite en douala": { t: "Tele̱ na duwala", ok: false },
+    "Je n'ai pas compris": { t: "Na si sengi", ok: false },
+    "Pouvez-vous répéter ?": { t: "Bino̱ le na lo teleye̱ mba ?", ok: false },
+    "Fermer": { t: "Kwese", ok: false },
+    "Ouvrir": { t: "Te le̱", ok: false },
+    "Retour": { t: "Tim ba", ok: false },
+    "Suivant": { t: "Mu pe̱ pe̱", ok: false },
+    "Précédent": { t: "Nya bu pe̱", ok: false },
+    "Aide": { t: "Jongwane̱", ok: false },
+    "Solde": { t: "E dia", ok: false },
+    "Frais": { t: "Muansedi", ok: false },
+    "Bénéficiaire": { t: "To mu tombuedi", ok: false },
+    "Confirmation": { t: "Bamse̱", ok: false },
+    "Numéro de compte": { t: "Number be ne̱nge̱ di ba", ok: false },
+    "Solde et compte": { t: "Mbolo bene", ok: false },
+    "Solde actuel": { t: "Di ba tatanu", ok: false },
+    "Solde insuffisant": { t: "Bo̱ngo̱ di si dongame̱ne̱", ok: false },
+    "Consultez votre solde": { t: "Ombua be ne̱nguedi no̱ngo̱ la mbolo bo̱ngo̱", ok: false },
+    "Transactions récentes": { t: "Sukane", ok: false },
+    "Histoire (Historique)": { t: "Miango", ok: false },
+    "Montant": { t: "Muaminga", ok: false, critical: true },   // mot incohérent dans le Word : « traduction (original) » affiché
+    "Référence": { t: "Epasi", ok: false },
+    "Libellé": { t: "Epasi", ok: false },
+    "Débit": { t: "Sumua", ok: false, critical: true },   // mot incohérent dans le Word : « traduction (original) » affiché
+    "Crédit": { t: "Ebale̱", ok: false },
+    "Effectuer un transfert": { t: "Tombise̱ mbolo", ok: false, critical: true },
+    "Confirmer": { t: "Bamse̱", ok: false, critical: true },
+    "Annuler": { t: "Sumua", ok: false, critical: true },
+    "Envoyer": { t: "Loma", ok: false, critical: true },
+    "Valider": { t: "Bamse̱", ok: false, critical: true },
+    "Modifier": { t: "Tuiko", ok: false },
+    "Consulter les frais": { t: "Jombua mbolo", ok: false },
+    "Continuer": { t: "Wala ne̱", ok: false },
+    "Recommencer": { t: "Bote̱a", ok: false },
+    "Enregistrer": { t: "Jingele̱", ok: false },
+    "Télécharger le reçu": { t: "Sane̱ la dipapa", ok: false },
+    "Réessayer": { t: "Kekise̱ pe̱te̱", ok: false },
+    "Se connecter": { t: "Sengane̱ la owa", ok: false },
+    "Se déconnecter": { t: "Si sengane̱ la owa", ok: false },
+    "Paiement marchand": { t: "Musawedi ma nyunga", ok: false },
+    "Salaire reçu": { t: "Kusa la musawedi", ok: false },
+    "Transfert reçu": { t: "Kusa la be tombedi", ok: false },
+    "Transfert envoyé": { t: "Loma la betombedi", ok: false },
+    "Facture d'électricité": { t: "Dipapa la betuikane̱", ok: false },
+    "Facture d'eau": { t: "Dipapa la madiba", ok: false },
+    "Recharge téléphone": { t: "Londe̱ la bebele̱di", ok: false },
+    "Retrait": { t: "Sumua", ok: false, critical: true },   // mot incohérent dans le Word : « traduction (original) » affiché
+    "Dépôt": { t: "Wele̱", ok: false },
+    "Remboursement": { t: "Timbise̱le̱", ok: false },
+    "Abonnement": { t: "Tidise̱", ok: false },
+    "Frais de transaction": { t: "Muansedi mua be tombedi", ok: false },
+    "Aucun frais": { t: "Muansedi to mô", ok: false },
+    "Total à débiter": { t: "Nje yese̱ bangame̱ne̱ no̱ o sumua", ok: false },
+    "Montant du transfert": { t: "Mususedi mua mulo loma", ok: false, critical: true },   // mot incohérent dans le Word : « traduction (original) » affiché
+    "Frais inclus": { t: "Mususedi mu sodi", ok: false, critical: true },   // mot incohérent dans le Word : « traduction (original) » affiché
+    "Frais en plus": { t: "Mususedi mu bati", ok: false, critical: true },   // mot incohérent dans le Word : « traduction (original) » affiché
+    "Taux": { t: "Musongi", ok: false, critical: true },   // mot incohérent dans le Word : « traduction (original) » affiché
+    "Nom du bénéficiaire": { t: "Dina la mutombuedi", ok: false },
+    "Numéro du bénéficiaire": { t: "Number mutombuedi", ok: false },
+    "Numéro de téléphone": { t: "Number ebelane̱", ok: false },
+    "Banque du bénéficiaire": { t: "Ne̱nge̱ la mutombuedi", ok: false },
+    "Motif du transfert": { t: "Nyoma be tombedi", ok: false },
+    "Ajouter un bénéficiaire": { t: "Bata la mutombuedi", ok: false },
+    "Choisir un bénéficiaire": { t: "Po̱so̱ la mutombwanedi", ok: false },
+    "Bénéficiaire introuvable": { t: "Si je̱ne̱ la mutombwanedi", ok: false },
+    "Vérifiez le nom et le numéro du bénéficiaire": { t: "Jombua la dina na number mutombuedi", ok: false },
+    "Vérifiez les informations avant de confirmer": { t: "Dele̱ jombua miango me̱se̱ to de̱nga̱ wa bamse̱", ok: false },
+    "De :": { t: "Nya :", ok: false },
+    "Vers :": { t: "La :", ok: false },
+    "Montant :": { t: "Musongi", ok: false, critical: true },   // mot incohérent dans le Word : « traduction (original) » affiché
+    "Frais :": { t: "Mususedi", ok: false, critical: true },   // mot incohérent dans le Word : « traduction (original) » affiché
+    "Total :": { t: "Musongi mu londi", ok: false, critical: true },   // mot incohérent dans le Word : « traduction (original) » affiché
+    "Numéro de compte : {n}": { t: "Number be ne̱nge̱ di ba : {n}", ok: false },   // composée : « Numéro de compte » + « : » + valeur protégée
+    "Numéro de compte : CM {n}": { t: "Number be ne̱nge̱ di ba : CM {n}", ok: false },
 
-    // ------------------------------------------------------------------------
-    // Barre d'état & En-têtes globales (Header / Stepper)
-    // ------------------------------------------------------------------------
-    "Environnement de test — données fictives, aucune transaction réelle.": { t: "Muma ma jombɛnɛ — mɛtɛ ma mōni mō̱ pe̱i.", ok: false },
-    "Protocole de test": { t: "Mbia ma jombɛnɛ", ok: false },
-    "Retour au hackathon": { t: "Timba o hackathon", ok: false },
-    "Banque en ligne": { t: "Banka o Internet", ok: false },
-    
-    "Solde": { t: "Mōni ma tikédi", ok: false },
-    "Frais": { t: "Mōni ma mabī", ok: false },
-    "Bénéficiaire": { t: "Moto o tuminelno̱", ok: false },
-    "Récapitulatif": { t: "Biyedi ma tɛlɛ", ok: false },
-    "Confirmation": { t: "Kame̱", ok: false },
+    // Entrées anglaises : la langue source peut être française ou anglaise ; la cible reste le Duala.
+    "Hello": { t: "Idiba bwam", ok: false, prefix: true },
+    "Welcome": { t: "Po̱ la bwam", ok: false, prefix: true },
+    "Thank you": { t: "Na som", ok: false },
+    "Please": { t: "Na so̱so̱ medi", ok: false },
+    "Yes": { t: "Ne medi é", ok: false },
+    "No": { t: "Ke̱m", ok: false },
+    "OK": { t: "Na kasi", ok: false },
+    "Goodbye": { t: "Na mala", ok: false },
+    "Type your question": { t: "Bino̱ tila mu yedi ma nu", ok: false },
+    "Speak now": { t: "Bino̱ to̱po̱ tatanu", ok: false },
+    "Show original": { t: "Bino̱ tande̱ te̱i-te̱i", ok: false },
+    "Voice assistant": { t: "Muta te da doi", ok: false },
+    "Smart chat": { t: "Singa dibiye̱", ok: false },
+    "What is my balance?": { t: "Nje' ye' etom yam ?", ok: false },
+    "How do I make a transfer?": { t: "Ne̱ ni tombele̱ ?", ok: false },
+    "Explain this page": { t: "Teleye̱ yen epassi", ok: false },
+    "Translate into Duala": { t: "Tele̱ na duwala", ok: false },
+    "Balance": { t: "E dia", ok: false },
+    "Current balance": { t: "Di ba tatanu", ok: false },
+    "Insufficient balance": { t: "Bo̱ngo̱ di si dongame̱ne̱", ok: false },
+    "Account number": { t: "Number be ne̱nge̱ di ba", ok: false },
+    "Account number: {n}": { t: "Number be ne̱nge̱ di ba : {n}", ok: false },
+    "Account number: CM {n}": { t: "Number be ne̱nge̱ di ba : CM {n}", ok: false },
+    "Recent transactions": { t: "Sukane", ok: false },
+    "Transaction history": { t: "Miango", ok: false },
+    "Amount": { t: "Muaminga", ok: false, critical: true },
+    "Amount:": { t: "Musongi", ok: false, critical: true },
+    "Reference": { t: "Epasi", ok: false },
+    "Description": { t: "Epasi", ok: false },
+    "Debit": { t: "Sumua", ok: false, critical: true },
+    "Credit": { t: "Ebale̱", ok: false },
+    "Fees": { t: "Muansedi", ok: false },
+    "Fees:": { t: "Mususedi", ok: false, critical: true },
+    "Transaction fees": { t: "Muansedi mua be tombedi", ok: false },
+    "No fees": { t: "Muansedi to mô", ok: false },
+    "Total:": { t: "Musongi mu londi", ok: false, critical: true },
+    "Recipient": { t: "To mu tombuedi", ok: false },
+    "Recipient name": { t: "Dina la mutombuedi", ok: false },
+    "Make a transfer": { t: "Tombise̱ mbolo", ok: false, critical: true },
+    "Confirm": { t: "Bamse̱", ok: false, critical: true },
+    "Cancel": { t: "Sumua", ok: false, critical: true },
+    "Send": { t: "Loma", ok: false, critical: true },
+    "Submit": { t: "Bamse̱", ok: false, critical: true },
+    "Edit": { t: "Tuiko", ok: false },
+    "View fees": { t: "Jombua mbolo", ok: false },
+    "Continue": { t: "Wala ne̱", ok: false },
+    "Start again": { t: "Bote̱a", ok: false },
+    "Save": { t: "Jingele̱", ok: false },
+    "Download receipt": { t: "Sane̱ la dipapa", ok: false },
+    "Try again": { t: "Kekise̱ pe̱te̱", ok: false },
+    "Sign in": { t: "Sengane̱ la owa", ok: false },
+    "Sign out": { t: "Si sengane̱ la owa", ok: false },
+    "Merchant payment": { t: "Musawedi ma nyunga", ok: false },
+    "Salary received": { t: "Kusa la musawedi", ok: false },
+    "Transfer received": { t: "Kusa la be tombedi", ok: false },
+    "Transfer sent": { t: "Loma la betombedi", ok: false },
+    "Electricity bill": { t: "Dipapa la betuikane̱", ok: false },
+    "Water bill": { t: "Dipapa la madiba", ok: false },
+    "Mobile phone top-up": { t: "Londe̱ la bebele̱di", ok: false },
+    "Withdrawal": { t: "Sumua", ok: false, critical: true },
+    "Deposit": { t: "Wele̱", ok: false },
+    "Refund": { t: "Timbise̱le̱", ok: false },
+    "Subscription": { t: "Tidise̱", ok: false },
+    "Total to debit": { t: "Nje yese̱ bangame̱ne̱ no̱ o sumua", ok: false },
+    "Phone number": { t: "Number ebelane̱", ok: false },
+    "Recipient's bank": { t: "Ne̱nge̱ la mutombuedi", ok: false },
+    "Transfer reason": { t: "Nyoma be tombedi", ok: false },
+    "Add a recipient": { t: "Bata la mutombuedi", ok: false },
+    "Choose a recipient": { t: "Po̱so̱ la mutombwanedi", ok: false },
+    "Recipient not found": { t: "Si je̱ne̱ la mutombwanedi", ok: false },
+    "Check the recipient's name and number": { t: "Jombua la dina na number mutombuedi", ok: false },
+    "Check the details before confirming": { t: "Dele̱ jombua miango me̱se̱ to de̱nga̱ wa bamse̱", ok: false },
+    "From:": { t: "Nya :", ok: false },
+    "To:": { t: "La :", ok: false },
+    "Close": { t: "Kwese", ok: false },
+    "Open": { t: "Te le̱", ok: false },
+    "Back": { t: "Tim ba", ok: false },
+    "Next": { t: "Mu pe̱ pe̱", ok: false },
+    "Previous": { t: "Nya bu pe̱", ok: false },
+    "Help": { t: "Jongwane̱", ok: false },
 
-    // ------------------------------------------------------------------------
-    // ÉTAPE 1 : SOLDE / ACCUEIL
-    // ------------------------------------------------------------------------
-    "TON COMPTE": { t: "KOUNTA AŊGO̱", ok: false },
-    "VOTRE COMPTE": { t: "KOUNTA AŊGO̱", ok: false },
-    "Consultez votre solde et lancez un transfert en toute sécurité.": { t: "Biyel mōni ma tikédi o bola denja na muna.", ok: false },
-    "SOLDE DISPONIBLE": { t: "MŌNI MA TIKÉDI", ok: false },
-    "Solde disponible": { t: "Mōni ma tikédi", ok: false },
-    "Numéro de compte :": { t: "Mika ma kounta :", ok: false, prefix: true },
-    "Compte courant": { t: "Kounta a mōni", ok: false },
+    // ================= À TRADUIRE (textes de la page de test, absents du Word ou « non renseigné ») =================
+    // "Récapitulatif": { t: "", ok: false },
+    // "Étape {n} sur {n}": { t: "", ok: false },
+    // "Votre compte": { t: "", ok: false },
+    // "Banque en ligne": { t: "", ok: false },
+    // "Connexion sécurisée": { t: "", ok: false },
+    // "Compte courant": { t: "", ok: false },
+    // "Compte épargne": { t: "", ok: false },
+    // "Date": { t: "", ok: false },
+    // "Solde disponible": { t: "", ok: false },
+    // "Environnement de test — données fictives, aucune transaction réelle.": { t: "", ok: false },
+    // "Protocole de test": { t: "", ok: false },
+    // "Retour au hackathon": { t: "", ok: false },
+    // "Consultez votre solde et lancez un transfert en toute sécurité.": { t: "", ok: false },
+    // "Sécurité": { t: "", ok: false },
 
-    "Effectuer un transfert": { t: "Bola denja", ok: false, critical: true },
-    "Consulter les frais": { t: "Biyel mōni ma mabī", ok: false },
-
-    "TRANSACTIONS RÉCENTES": { t: "MŌNI MA MATITA MA TƐLƐ", ok: false },
-    "Paiement marchand": { t: "Feya a mot'a muna", ok: false },
-    "Salaire reçu": { t: "Mōni ma musono ma kumi", ok: false },
-    "Transfert reçu": { t: "Denja e kumi", ok: false },
-    "Facture électricité": { t: "Feya a tɛtɛ electricité", ok: false },
-
-    // ------------------------------------------------------------------------
-    // ÉTAPE 2 : FRAIS DE TRANSFERT
-    // ------------------------------------------------------------------------
-    "FRAIS DE TRANSFERT": { t: "MŌNI MA MABĪ MA DENJA", ok: false },
-    "Choisissez le type de transfert et le montant. Les frais sont calculés automatiquement.": { t: "Pwa dǐn la denja na mōni. Mōni ma mabī ma malabwama o tɛlɛ.", ok: false },
-    "TYPE D'OPÉRATION": { t: "DǏN LA DENJA", ok: false },
-    "Compte Safinum": { t: "Kounta a Safinum", ok: false },
-    "Transfert instantané et gratuit": { t: "Denja a nyango̱ a bwa na libre", ok: false },
-    "MONTANT À ENVOYER": { t: "MŌNI O PULANO̱ O TUMA", ok: false },
-    "Total à débiter": { t: "Mōni ma mawa", ok: false },
-    "Solde après opération": { t: "Mōni ma tikédi o pombɛ", ok: false },
-    "Gratuit": { t: "Bwa", ok: false },
-
-    // ------------------------------------------------------------------------
-    // ÉTAPE 3 : BÉNÉFICIAIRE
-    // ------------------------------------------------------------------------
-    "Renseignez les informations du destinataire. Vérifiez toujours le numéro avant de valider.": { t: "Tilaedi mɛtɛ ma moto o tuminelno̱. Kengisedi mika ma foon nɛnɛ o pɛtɛ.", ok: false },
-    "Ce bénéficiaire n'a jamais été utilisé sur ce compte. Vérifiez le numéro avant de continuer.": { t: "Dǐn la moto tɛ̈ e mo̱ ko̱ndi bolane̱ o kounta mɛnɛ. Kengisedi mika o pɛtɛ.", ok: false },
-    "NOM DU BÉNÉFICIAIRE": { t: "DǏN LA MOTO O TUMINELNO̱", ok: false },
-    "NUMÉRO DE TÉLÉPHONE": { t: "MIKA MA FOON", ok: false },
-    "MOTIF DU TRANSFERT": { t: "NJÉ O TUMINELNO̱", ok: false },
-    "Paiement de services": { t: "Feya a boleki", ok: false },
-    "NOTE (OPTIONNEL)": { t: "TILAEDI (PETE)", ok: false },
-    "J'ai vérifié le nom et le numéro du bénéficiaire.": { t: "Na kengisedi dǐn na mika ma foon.", ok: false },
-
-    // ------------------------------------------------------------------------
-    // ÉTAPE 4 : RÉCAPITULATIF
-    // ------------------------------------------------------------------------
-    "Vérifiez les informations avant de confirmer le transfert.": { t: "Biyel mɛtɛ mɛnɛ o pɛtɛ o kame̱ denja.", ok: false },
-    "Montant": { t: "Mōni", ok: false },
-    "Référence": { t: "Référence", ok: false },
-    "Opération": { t: "Boledikɛ", ok: false },
-    "Je confirme que les informations ci-dessus sont correctes.": { t: "Na kame̱ te̱ mɛtɛ mɛnɛ e pɔ̱ te̱i.", ok: false },
-
-    // Actions critiques (Boutons)
-    "Continuer": { t: "Bange̱le̱", ok: false, critical: true },
-    "Retour": { t: "Timba", ok: false },
-    "Modifier": { t: "Tucke̱", ok: false },
-    "Confirmé": { t: "Kame̱i", ok: false, critical: true },
-    "Confirmant": { t: "Kame̱ne̱", ok: false, critical: true },
-    "Confirmer le transfert": { t: "Kame̱ denja", ok: false, critical: true },
-    "Nouveau transfert": { t: "Denja e pe̱te̱", ok: false, critical: true },
-
-    // ------------------------------------------------------------------------
-    // ÉTAPE 5 : CONFIRMATION & SUCCÈS
-    // ------------------------------------------------------------------------
-    "Transfert effectué": { t: "Denja e bolani bwam", ok: false },
-    "Votre transfert a été envoyé avec succès.": { t: "Denja aŋgo̱ e tumineli na muna.", ok: false },
-    "Statut": { t: "Tɛlɛ", ok: false },
-    "Succès": { t: "Bwam", ok: false },
-
-    // ------------------------------------------------------------------------
-    // GESTION DES ERREURS & SÉCURITÉ (Panneau Latéral / Banner)
-    // ------------------------------------------------------------------------
-    "Une erreur est survenue": { t: "Bwesɛ e kumi", ok: false },
-    "Vous devez confirmer les informations avant de valider le transfert.": { t: "Ango o kame̱ mɛtɛ o pɛtɛ o tuma denja.", ok: false },
-    
-    "Sécurité": { t: "Muna", ok: false },
-    "Vérifiez toujours le nom et le numéro du bénéficiaire avant de confirmer un transfert.": { t: "Biyedi mɛtɛ ma moto na foon o pɛtɛ o kame̱ denja.", ok: false },
-    "Connexion sécurisée": { t: "Muna ma mɛtɛ", ok: false }
+    // ================= NON ACTIVÉES (problème à régler avec les locuteurs) =================
+    // "Bonsoir": { t: "Ebiyamu ya bwam / Lo windele", ok: false },   // deux traductions séparées par « / » dans le Word : en choisir une
+    // "Votre solde est de {n} FCFA": { t: "Bo̱ngo̱ be nde {n} franki CFA (bediyedi bene)", ok: false },   // la traduction contient un texte entre parenthèses « (bediyedi bene) » et « franki CFA » : à clarifier (et {n} contient déjà FCFA ?)
+    // "Frais {n} FCFA": { t: "Muansedi na fflanki nya CFA", ok: false },   // la traduction du Word ne contient pas {n} : le montant disparaîtrait
+    // "Bénéficiaire": { t: "Mukusedi ou mutombuedi", ok: false },   // 2e traduction différente de la 1re (« To mu tombuedi ») : la 1re est utilisée
   }
 };
