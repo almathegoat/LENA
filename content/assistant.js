@@ -89,8 +89,8 @@ Lena.assistant = (() => {
     // Traduction de la page
     const wantsTranslate = /(traduc|translat|langue|language|\ben\b|\bto\b|\binto\b)/.test(q);
     if (/\b(duala|douala)\b/.test(q) && wantsTranslate) return out({ lang: "dua", text: T.dua });
-    if (/ewondo/.test(q)) return out({ lang: "ewo", text: T.ewo });
-    if (/(fulfulde|peul|foulfoulde)/.test(q)) return out({ lang: "ful", text: T.ful });
+    if (/ewondo/.test(q) && wantsTranslate) return out({ text: "Cette traduction n'est pas encore disponible sur ce modèle." });
+    if (/(fulfulde|peul|foulfoulde)/.test(q) && wantsTranslate) return out({ text: "Cette traduction n'est pas encore disponible sur ce modèle." });
     if (/(francais|french|original)/.test(q) && /(page|traduc|translat|retour|back|revenir|affich|show|display)/.test(q)) return out({ lang: "", text: T.orig });
 
     // Solde : lu par content/balance.js (montant écrit exact + montant en toutes lettres pour la voix)

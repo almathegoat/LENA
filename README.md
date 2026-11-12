@@ -56,6 +56,7 @@ Assistante vocale + traduction de page en langues camerounaises. Squelette front
 ## Limites connues / à faire
 - Les traductions restent partielles : seules les phrases du dictionnaire sont traduites, et les entrées `ok: false` doivent être validées avant la remise.
 - L'assistante répond en français ou en anglais selon la langue reconnue. Pour le Duala, elle reconnaît seulement les phrases présentes dans le dictionnaire et demande de répéter en Duala ; des réponses conversationnelles plus riches nécessitent des exemples validés par un locuteur.
+- Les demandes de traduction vers l’Ewondo ou le Fulfulde affichent « Cette traduction n'est pas encore disponible sur ce modèle. » au lieu de présenter ces traductions vides comme si elles avaient été faites.
 - Pas de détection de la langue parlée (aucune API gratuite ne reconnaît ces langues) : on choisit la langue par le panneau ou par commande (« Traduire en duala »).
 - Le « chat intelligent » répond par règles (solde, transfert, frais, explication de page). Un vrai modèle de langue enverrait du texte à un serveur : à éviter ou à déclarer.
 - Le bandeau décale la page vers le bas pendant qu'il est affiché (retiré à la fermeture). À vérifier sur l'environnement du jury.

@@ -281,6 +281,12 @@ Lena.ui = (() => {
 
   // ---------- Traduction ----------
   function setLang(code) {
+    if (code === "ewo" || code === "ful") {
+      $("#tradStatus").textContent = "Cette traduction n'est pas encore disponible sur ce modèle.";
+      $("#tradStatus").classList.add("warn");
+      return;
+    }
+    $("#tradStatus").classList.remove("warn");
     stopPageReading("Lecture interrompue.");
     if (code) {
       T.setLanguage(code); current = last = code; bannerClosed = false;
